@@ -1,6 +1,7 @@
 //this file has to be named index.js because webex expects the first entry to be named index.js
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./index.css"; //webpex will automatically include the syles to the application
 
 const pizzaData = [
   {
@@ -51,7 +52,8 @@ const pizzaData = [
 function App() {
   //since we can only return one element in a component (nesting component would help get all components together)
   return (
-    <div>
+    //in jsx we use className, not class it's reserved already in JS
+    <div className="container">
       <Header />
       <Menu />
       <Footer />
@@ -59,22 +61,97 @@ function App() {
   );
 }
 
+/**
+ * *styling react Applications
+ *Inline styling, css modules, or SAS, styled components, tailwinds, external css
+ *inline css (in html we can use style => '') but in JSX we need to use javascript to style
+ *style in javaScrtipt are like creating an object so they have to be in strings, also the css to js convention is from using dashes to camel case
+ *The best and easiest way to style react is to add an external css file
+ */
+
 //header component
 function Header() {
-  return <h1>Italian Pizza Co.</h1>;
+  // const style={{ color: "red", fontSize: "48px", textTransform: "uppercase" }}
+
+  const style = {};
+
+  return (
+    <header className="header">
+      <h1
+        style={{ color: "red", fontSize: "48px", textTransform: "uppercase" }}
+      >
+        Italian Pizza Co.
+      </h1>
+    </header>
+  );
 }
+
+/**
+ * PASSING AND RECEIVING PROPS (prop = property)
+ * Props - is the way of passing data between components (from parent to child components)
+ * You can pass anything as a prop, it's not just a number or string it could be arrays
+ *
+ * 2 ways to define props
+ * 1- pass props into the component
+ * 2- receive the prop into the component we passed into
+ *
+ * props, immutability, and one-way data flow
+ * - props are used to pass data from parent components to child components (down the component tree)
+ * - Essential tool to configure and customize components (like function parameters)
+ * - with props, parent components control how child components look and work
+ * - Anything can be passed as props: single values, arrays, objects, functions, even other components
+ *
+ * (props are read-only) they are immutable!  this is one of react's strict rule (if you need to mutate props, you actually need state)
+ *  - because props are objects, and when changes happen to the child they will affect the parent as well.
+ *  - Mutating props would affect parent, creating side effects (not pure) (never mutate any date outside of it's function scope)
+ *  - Components have to be pure functions in terms of props and state
+ *  - This allows React to optimize apps, avoid bugs, make apps preddictable
+ *
+ * Props is data coming from the outside, and can only be updated by the parent component
+ * state is internal data that can be updated by the component's logic
+ */
 
 //menu component
 function Menu() {
   return (
-    <div>
-      <h2>Our menu</h2>
-      <Pizza />
-      <Pizza />
-      {/* 
-      example of reusing components
-      <Pizza />
-      <Pizza /> */}
+    <main className="menu">
+      <h2>Our menu at Jakes Pizza</h2>
+      <Pizza
+        name="Spinaci"
+        ingredients="Tomato, mozarella, spinach, and ricotta cheese"
+        photoName="pizzas/spinaci.jpg"
+        price={10}
+      />
+
+      <Pizza
+        name="Pizza Funghi"
+        ingredients="Tomato, mushrooms"
+        price={12}
+        photoName="pizzas/funghi.jpg"
+      />
+    </main>
+  );
+}
+
+/**
+ * CREATING COMPONENTS & REUSEABILITY
+ * each component can only return one element (but they could be nested)
+ * in react we write components using functions (two important rulesa; 1.function name has to start with uppercase letter 2. it has to return some markup)
+ *
+ * we could also write the components as arrow function or as declarative functions
+ * const Test = () =>
+ */
+
+function Pizza(props) {
+  console.log(props);
+  return (
+    <div className="pizza">
+      <img src={props.photoName} alt={props.name} />
+      <div>
+        <h3>{props.name}</h3>
+        <p>{props.ingredients}</p>
+        <span>{props.price + 3}</span>
+      </div>
     </div>
   );
 }
@@ -91,27 +168,11 @@ function Footer() {
   //   else alert("sorry we're closed");
 
   return (
-    <footer>{new Date().toLocaleDateString()}. We're Currenly Open</footer>
+    <footer className="footern">
+      {new Date().toLocaleDateString()}. We're Currenly Open
+    </footer>
   );
   // return React.createElement("footer", null, "we are Currently open!");
-}
-
-/**
- * we could also write the components as arrow function or as declarative functions
- * const Test = () =>
- */
-
-//CREATING COMPONENTS & REUSEABILITY
-//each component can only return one element (but they could be nested)
-//in react we write components using functions (two important rulesa; 1.function name has to start with uppercase letter 2. it has to return some markup)
-function Pizza() {
-  return (
-    <div>
-      <img src="pizzas/spinaci.jpg" alt="pizza spinaci" />
-      <h2>Pizza Spinaci🍕</h2>
-      <p>Tomato, mozarella, spinach, and ricotta cheese</p>
-    </div>
-  );
 }
 
 //in future we won't be writing all this by hand
@@ -154,4 +215,11 @@ root.render(
  * IMPERATIVE: manual DOM element selections and DOM traversing
  *          - Step-by-step DOM mutations until we reach the desired UI
  *            (vanilla react, basically tell react how to do things step by step)
+ */
+
+/**
+ * 
+      example of REUSING components
+      <Pizza />
+      <Pizza /> 
  */
