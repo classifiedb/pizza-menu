@@ -113,10 +113,46 @@ function Header() {
 
 //menu component
 function Menu() {
+  const pizzas = [];
+  //   const pizzas = pizzaData;
+  const numPizzas = pizzas.length;
+  /**
+   * - outside the return means outside JSX and we can use any JavaScript we want
+   * - 2 returns can not be executed at the same time
+   */
   return (
     <main className="menu">
       <h2>Our menu at Jakes Pizza</h2>
-      <Pizza
+
+      {/**
+       * RENDERING LISTS
+       * - Rendering: is when we have an array and want to create a component for each element of an array
+       */}
+
+      {/* && conditional rendering: react doesn't return true or false, but conditional rendering is for truesy or falsy value. but it will return zero on the UI */}
+      {/* {numPizzas > 0 && (
+        <ul className="pizzas">
+          {pizzaData.map((pizza) => (
+            //After mapping each mapped element need a unique key
+            <Pizza pizzaObj={pizza} key={pizza.name} />
+
+            //<Pizza name={pizza.name} ingredients={pizza.ingredients} photoName={pizza.photoName} /> this would work but not appropriate
+          ))}
+        </ul>
+      )} */}
+
+      {/* Conditional rendering with ternaries (the benefit of using ternaries is there are alternative options if the condition fails; also we cannot use if/else because it does not produce a value*/}
+      {numPizzas > 0 ? (
+        <ul className="pizzas">
+          {pizzas.map((pizza) => (
+            <Pizza pizzaObj={pizza} key={pizza.name} />
+          ))}
+        </ul>
+      ) : (
+        <p>we're still working on our menu. Please come back later 🤪</p>
+      )}
+
+      {/* <Pizza
         name="Spinaci"
         ingredients="Tomato, mozarella, spinach, and ricotta cheese"
         photoName="pizzas/spinaci.jpg"
@@ -128,7 +164,7 @@ function Menu() {
         ingredients="Tomato, mushrooms"
         price={12}
         photoName="pizzas/funghi.jpg"
-      />
+      /> */}
     </main>
   );
 }
@@ -142,39 +178,88 @@ function Menu() {
  * const Test = () =>
  */
 
+//when rendering for instance a list passing an object in the component is more appropriat to have other component access the data via props
 function Pizza(props) {
   console.log(props);
+
+  if (props.pizzaObj.soldOut) return null;
+
   return (
-    <div className="pizza">
-      <img src={props.photoName} alt={props.name} />
+    <li className="pizza">
+      <img src={props.pizzaObj.photoName} alt={props.pizzaObj.name} />
       <div>
-        <h3>{props.name}</h3>
-        <p>{props.ingredients}</p>
-        <span>{props.price + 3}</span>
+        <h3>{props.pizzaObj.name}</h3>
+        <p>{props.pizzaObj.ingredients}</p>
+        <span>{props.pizzaObj.price + 3}</span>
       </div>
-    </div>
+    </li>
   );
 }
+
+/**
+ * Extracting JSX into a NEW Component
+ */
 
 //footer component
 function Footer() {
   const hour = new Date().getHours();
-  const openHour = 12;
+  const openHour = 10;
   const closeHour = 22;
   const isOpen = hour >= openHour && hour <= closeHour;
   console.log(isOpen);
 
-  //   if (hour >= openHour && hour <= closeHour) alert("we're currently open!");
-  //   else alert("sorry we're closed");
+  /*   if (hour >= openHour && hour <= closeHour) alert("we're currently open!");
+       else alert("sorry we're closed");
+  */
 
+  /* Conditional Rendering with MULTIPLE RETURNS */
+
+  //   if (!isOpen) return <p> were happy to welcome you after {isOpen}</p>;
   return (
     <footer className="footern">
-      {new Date().toLocaleDateString()}. We're Currenly Open
+      {/**
+       * Conditional rendering with &&
+       * - use the && operator to short circuit or conditionally render
+       * we could also use this if there was no need to conditionally render {new Date().toLocaleDateString()}. We're Currenly Open
+       *
+      {isOpen && (
+        <div className="order">
+          <p>we are open until {closeHour}:00. come visit us or order online</p>
+          <button className="btn">Order</button>
+        </div>
+      )}
+      */}
+
+      {/* ternary conditional rendering */}
+      {isOpen ? (
+        // <div className="order">
+        //   <p>we are open until {closeHour}:00. come visit us or order online</p>
+        //   <button className="btn">Order</button>
+        // </div>
+
+        //Extracting JSX into a new component
+        <Order closeHour={closeHour} />
+      ) : (
+        <p>
+          we are happy to welcome you between {openHour}:00 and {closeHour}:00
+        </p>
+      )}
     </footer>
   );
   // return React.createElement("footer", null, "we are Currently open!");
 }
 
+//to access the closeHour we use props because closeHour was defined in a different component (extracting JSX into a new component)
+function Order(props) {
+  return (
+    <div className="order">
+      <p>
+        we are open until {props.closeHour}:00. come visit us or order online
+      </p>
+      <button className="btn">Order</button>
+    </div>
+  );
+}
 //in future we won't be writing all this by hand
 //this is how to render the root in react 18 which may differ to older react versions
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -222,4 +307,27 @@ root.render(
       example of REUSING components
       <Pizza />
       <Pizza /> 
+ */
+
+/**
+ * RULES OF JSX
+ * GENERAL JSX RULES: JSX works essentially like HTML, but we can enter "JavaScript mode" by using {} (for text or attributes)
+ * - we can place JavaScript expression inside {}. Eg. reference variables, create arrays or objects [].map(), ternary operator
+ * - Statement are not allowed (if/else, for, switch)
+ * - JSX produces a JavaScript expression (the ones below are the same thing)
+ *      const el = <h1>Hello React!</h1>
+ *      const el = React.createElement("h1", null, "Hello React!");
+ *      1. we can place other pieces of JSX inside {}
+ *      2. we can write JSX anywhere inside a component (in if/else, assign to variables, pass it into functions)
+ * - A piece of JSX can only have one root element. if you need more, use <React.Fragment> (or the short <>)
+ *
+ * DIFFERENCES BETWEEN REACT JSX AND HTML5
+ * - className instead of HTML's class
+ * - htmlFor instead of HTML's for
+ * - Every tag needs to be closed. Eg. <img /> or <br />
+ * - All event handlers and other properties need to be camelCased. Eg. onClick or onMouseOver
+ * - Exception: aria-* and data-* are written with dashes like in HTML
+ * - CSS inline styles are written like this: {{<style}} (to reference a variable, and then an object)
+ * - CSS property names are also camelCased
+ * - Comments need to be in {} (because they are JS)
  */
