@@ -44,7 +44,7 @@ const pizzaData = [
     ingredients: "Tomato, mozarella, ham, aragula, and burrata cheese",
     price: 18,
     photoName: "pizzas/prosciutto.jpg",
-    soldOut: false,
+    soldOut: true,
   },
 ];
 
@@ -113,16 +113,19 @@ function Header() {
 
 //menu component
 function Menu() {
-  const pizzas = [];
-  //   const pizzas = pizzaData;
+  // const pizzas = [];
+  const pizzas = pizzaData;
   const numPizzas = pizzas.length;
   /**
    * - outside the return means outside JSX and we can use any JavaScript we want
    * - 2 returns can not be executed at the same time
    */
+
+  //The JSX returned is required to be a single element, wrapping element in a <div></div> works but sometimes it disrupts the syle so instead we use a react Fragment <></>
+  //but when the itmes involves a list we could use <React.Fragment key=''></React.Fragment> key is optional depending on the data being passed (<React.Fragment></React.Fragment> === <></>)
   return (
     <main className="menu">
-      <h2>Our menu at Jakes Pizza</h2>
+      <h2>Our Menu 🍕</h2>
 
       {/**
        * RENDERING LISTS
@@ -143,11 +146,18 @@ function Menu() {
 
       {/* Conditional rendering with ternaries (the benefit of using ternaries is there are alternative options if the condition fails; also we cannot use if/else because it does not produce a value*/}
       {numPizzas > 0 ? (
-        <ul className="pizzas">
-          {pizzas.map((pizza) => (
-            <Pizza pizzaObj={pizza} key={pizza.name} />
-          ))}
-        </ul>
+        <React.Fragment>
+          <p>
+            Authentic Italian cuisine. 6 creative dishes to choose from. All
+            from our stone oven, all organic, all delicious!
+          </p>
+
+          <ul className="pizzas">
+            {pizzas.map((pizza) => (
+              <Pizza pizzaObj={pizza} key={pizza.name} />
+            ))}
+          </ul>
+        </React.Fragment>
       ) : (
         <p>we're still working on our menu. Please come back later 🤪</p>
       )}
@@ -179,18 +189,20 @@ function Menu() {
  */
 
 //when rendering for instance a list passing an object in the component is more appropriat to have other component access the data via props
-function Pizza(props) {
-  console.log(props);
+function Pizza({ pizzaObj }) {
+  //pizzaObj is matching the prop being passed to the other components
+  console.log(pizzaData);
 
-  if (props.pizzaObj.soldOut) return null;
+  // we can manipulate items from the pizzaObj
+  // if (pizzaObj.soldOut) return null;
 
   return (
-    <li className="pizza">
-      <img src={props.pizzaObj.photoName} alt={props.pizzaObj.name} />
+    <li className={`pizza ${pizzaObj.soldOut ? "sold-out" : ""}`}>
+      <img src={pizzaObj.photoName} alt={pizzaObj.name} />
       <div>
-        <h3>{props.pizzaObj.name}</h3>
-        <p>{props.pizzaObj.ingredients}</p>
-        <span>{props.pizzaObj.price + 3}</span>
+        <h3>{pizzaObj.name}</h3>
+        <p>{pizzaObj.ingredients}</p>
+        <span>{pizzaObj.soldOut ? "SOLD OUT" : pizzaObj.price}</span>
       </div>
     </li>
   );
@@ -238,7 +250,7 @@ function Footer() {
         // </div>
 
         //Extracting JSX into a new component
-        <Order closeHour={closeHour} />
+        <Order closeHour={closeHour} openHour={openHour} />
       ) : (
         <p>
           we are happy to welcome you between {openHour}:00 and {closeHour}:00
@@ -250,11 +262,13 @@ function Footer() {
 }
 
 //to access the closeHour we use props because closeHour was defined in a different component (extracting JSX into a new component)
-function Order(props) {
+function Order({ closeHour, openHour }) {
+  //instead of using props and props.closeHour or props.openHour: we are passing the objects of closeHour and openHour and just using closeHour or openHour without props.
   return (
     <div className="order">
       <p>
-        we are open until {props.closeHour}:00. come visit us or order online
+        we are open from{openHour}:00 to {closeHour}:00. come visit us or order
+        online
       </p>
       <button className="btn">Order</button>
     </div>
@@ -330,4 +344,17 @@ root.render(
  * - CSS inline styles are written like this: {{<style}} (to reference a variable, and then an object)
  * - CSS property names are also camelCased
  * - Comments need to be in {} (because they are JS)
+ */
+
+/**
+ * SUMMARY
+ * - JSX block is what we return from a component
+ *
+ * Component contatins -->Data --> JS Logic --> Appearance: JSX (HTML, CSS, JS inside {})
+ *
+ * Parents components can pass data to direct child component using props
+ * - props can only be passed from parents to children and not the other way
+ *
+ * Rendering multiple components at once using the JavaScript .map() method
+ * - components can be conditionally rendered using JS tools: &&, ?, and multiple return
  */
