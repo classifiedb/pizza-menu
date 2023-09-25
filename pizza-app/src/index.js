@@ -73,7 +73,7 @@ function App() {
 function Header() {
   // const style={{ color: "red", fontSize: "48px", textTransform: "uppercase" }}
 
-  const style = {};
+  // const style = {};
 
   return (
     <header className="header">
